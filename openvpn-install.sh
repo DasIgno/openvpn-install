@@ -817,6 +817,7 @@ persist-tun
 keepalive 10 120
 topology subnet
 server 10.42.42.0 255.255.255.0
+client-to-client
 ifconfig-pool-persist ipp.txt" >>/etc/openvpn/server.conf
 
 	# DNS resolvers
@@ -890,15 +891,19 @@ ifconfig-pool-persist ipp.txt" >>/etc/openvpn/server.conf
 		fi
 		;;
 	esac
-	echo 'push "redirect-gateway def1 bypass-dhcp"' >>/etc/openvpn/server.conf
+	echo '#push "redirect-gateway def1 bypass-dhcp"
+push "route 10.42.42.0/24"
+push "route 217.160.12.75/32"' >>/etc/openvpn/server.conf
 
 	# IPv6 network settings if needed
 	if [[ $IPV6_SUPPORT == 'y' ]]; then
 		echo 'server-ipv6 fd42:42:42:42::/112
 tun-ipv6
 push tun-ipv6
-push "route-ipv6 2000::/3"
-push "redirect-gateway ipv6"' >>/etc/openvpn/server.conf
+#push "route-ipv6 2000::/3"
+#push "redirect-gateway ipv6"
+push "route-ipv6 fd42:42:42:42::/112"
+push "route-ipv6 2a01:239:29b:b300::1/128"' >>/etc/openvpn/server.conf
 	fi
 
 	if [[ $COMPRESSION_ENABLED == "y" ]]; then
@@ -1080,6 +1085,7 @@ tls-version-min 1.2
 tls-cipher $CC_CIPHER
 ignore-unknown-option block-outside-dns
 setenv opt block-outside-dns # Prevent Windows 10 DNS leak
+askpass /etc/openvpn/client/askpass
 verb 3" >>/etc/openvpn/client-template.txt
 
 	if [[ $COMPRESSION_ENABLED == "y" ]]; then
