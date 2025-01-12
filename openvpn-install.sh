@@ -818,6 +818,7 @@ keepalive 10 120
 topology subnet
 server 10.42.42.0 255.255.255.0
 client-to-client
+client-config-dir ccd
 ifconfig-pool-persist ipp.txt" >>/etc/openvpn/server.conf
 
 	# DNS resolvers
@@ -1106,6 +1107,14 @@ function newClient() {
 		read -rp "Client name: " -e CLIENT
 	done
 
+ 	echo ""
+  	echo "Do you want to set persistent ips for this client?"
+   	echo "(the number will be the last segment of the ip addresses)"
+
+ 	until [[ [ $IPCLIENTSEG -ge 200 && $IPCLIENTSEG -le 253 ] || $IPCLIENTSEG =~ ^[0]$ ]]; do
+  		read -rp "Enter number in range [200-253] or 0 for dynamic ips: " IPCLIENTSEG
+	done
+	
 	echo ""
 	echo "Do you want to protect the configuration file with a password?"
 	echo "(e.g. encrypt the private key with a password)"
@@ -1193,6 +1202,18 @@ function newClient() {
 	echo "The configuration file has been written to $homeDir/$CLIENT.ovpn."
 	echo "Download the .ovpn file and import it in your OpenVPN client."
 
+	# Assign static ips to client
+	if [[ $IPCLIENTSEG != '0' ]]; then
+ 		{
+   			echo "ifconfig-push 10.42.42.$IPCLIENTSEG 255.255.255.0"
+	  		echo "idconfig-ipv6-push fd42:42:42:42::$IPCLIENTSEG/64"
+		} >>"/etc/openvpn/ccd/$CLIENT"
+
+		echo ""
+		echo "CCD file has been written to /etc/openvpn/ccd/$CLIENT."
+		echo "$CLIENT will have a static ipv4 10.42.42.$IPCLIENTSEG."
+		echo "$CLIENT will have a static ipv6 fd42:42:42:42::$IPCLIENTSEG."
+	fi
 	exit 0
 }
 
