@@ -1242,6 +1242,7 @@ function revokeClient() {
 	rm -f /etc/openvpn/crl.pem
 	cp /etc/openvpn/easy-rsa/pki/crl.pem /etc/openvpn/crl.pem
 	chmod 644 /etc/openvpn/crl.pem
+	find /etc/openvpn/ccd/ -maxdepth 1 -name "$CLIENT" -delete
 	find /home/ -maxdepth 2 -name "$CLIENT.ovpn" -delete
 	rm -f "/root/$CLIENT.ovpn"
 	sed -i "/^$CLIENT,.*/d" /etc/openvpn/ipp.txt
