@@ -1111,8 +1111,12 @@ function newClient() {
   	echo "Do you want to set persistent ips for this client?"
    	echo "(the number will be the last segment of the ip addresses)"
 
- 	until [[ [ $IPCLIENTSEG -ge 200 && $IPCLIENTSEG -le 253 ] || $IPCLIENTSEG =~ ^[0]$ ]]; do
+ 	until [[ ($IPCLIENTSEG -ge 200 && $IPCLIENTSEG -le 253) || $IPCLIENTSEG -eq 0 ]]; do
   		read -rp "Enter number in range [200-253] or 0 for dynamic ips: " IPCLIENTSEG
+		IPCLIENTSEG = $(echo $IPCLIENTSEG | grep -E '^[0-9]+$')
+		if [[ -z $IPCLIENTSEG ]]; then
+			IPCLIENTSEG = -1
+		fi
 	done
 	
 	echo ""
@@ -1206,7 +1210,7 @@ function newClient() {
 	if [[ $IPCLIENTSEG != '0' ]]; then
  		{
    			echo "ifconfig-push 10.42.42.$IPCLIENTSEG 255.255.255.0"
-	  		echo "idconfig-ipv6-push fd42:42:42:42::$IPCLIENTSEG/64"
+	  		echo "ifconfig-ipv6-push fd42:42:42:42::$IPCLIENTSEG/64"
 		} >>"/etc/openvpn/ccd/$CLIENT"
 
 		echo ""
