@@ -1111,12 +1111,15 @@ function newClient() {
   	echo "Do you want to set persistent ips for this client?"
    	echo "(the number will be the last segment of the ip addresses)"
 
- 	until [[ ($IPCLIENTSEG -ge 200 && $IPCLIENTSEG -le 253) || $IPCLIENTSEG -eq 0 ]]; do
-  		read -rp "Enter number in range [200-253] or 0 for dynamic ips: " IPCLIENTSEG
-		IPCLIENTSEG = $(echo $IPCLIENTSEG | grep -E '^[0-9]+$')
-		if [[ -z $IPCLIENTSEG ]]; then
-			IPCLIENTSEG = -1
+	until [[ ($IPCLIENTSEG -ge 200 && $IPCLIENTSEG -le 253) || $IPCLIENTSEG -eq 0 ]]; do
+		read -rp "Enter number in range [200-253] or 0 for dynamic ips: " IPCLIENTSEG
+		if [[ $IPCLIENTSEG =~ ^[0-9]+$ ]]; then
+			if [[ $IPCLIENTSEG -ge 200 && $IPCLIENTSEG -le 253 ]] || [[ $IPCLIENTSEG -eq 0 ]]; then
+				break
+			fi
 		fi
+		echo "Invalid input. Please enter a number in the range [200-253] or 0 for dynamic ips."
+		IPCLIENTSEG=-1
 	done
 	
 	echo ""
