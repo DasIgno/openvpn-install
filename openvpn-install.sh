@@ -893,8 +893,8 @@ ifconfig-pool-persist ipp.txt" >>/etc/openvpn/server.conf
 		;;
 	esac
 	echo '#push "redirect-gateway def1 bypass-dhcp"
-push "route 10.42.42.0/24"
-push "route 217.160.12.75/32"' >>/etc/openvpn/server.conf
+push "route 10.42.42.0 255.255.255.0"
+push "route 217.160.12.75 255.255.255.255"' >>/etc/openvpn/server.conf
 
 	# IPv6 network settings if needed
 	if [[ $IPV6_SUPPORT == 'y' ]]; then
